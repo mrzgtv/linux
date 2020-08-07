@@ -1,0 +1,42 @@
+Установка VirtualBox
+Установка ubuntu20.04, с образа на виртуальную машину, запуск.
+Установка компиляторов для установки драйверов: 
+1. Devices - Insert Guest Additions CD image... (вставляем образ с драйверами в виртуальный "оптический" привод)
+2. gcc make perl - sudo apt install gcc make perl, вводим пароль.
+# команда 'Echo $?' - проверка кода возврата предыдущей операции (если 0, команда выполнена успешно)
+3. cd media/username/VBox_GAs_6.1.12 (переходим в директорию образа)
+4. sudo ./autorun.sh - запуск скрипта установки драйверов
+5. sudo reboot - перезагрузка ОС
+6. Изменение конфига для возможности установки без ввода пароля каждый раз (sudo):
+sudo visudo - открываем конфиг файл, чтобы внести в него изменения:
+"#includedir /etc/sudoers.di
+username ALL=(ALL:ALL) NOPASSWD:ALL"
+сохраняем, закрываем.
+7. sudo apt install openssh-server
+
+Задание №5.
+
+в терминале хоста: ssh-keygen - генерируем ssh ключ
+там же: ssh-copy-id ilnaz@192.168.1.67 - копируем пару ключа на ВМ
+проверка, через терминал хоста - ssh ilnaz@192.168.1.67 - успешное подключение к ВМ через терминал хоста, видим приветственный текст ВМ.
+
+sudo apt-get install ufw - установка/проверка (установлен ли?) ufw
+sudo ufw status verbose - проверка статуса ufw (по умолчанию - inactive)
+sudo ufw allow ssh - добавление правила, дающее право подключаться по ssh
+sudo ufw allow 22 - добавление порта 22 в исключения ufw
+sudo ufw enable - включание ufw
+sudo ufw status verbose - проверка статуса ufw. результат:
+#Status: active
+#Logging: on (low)
+#Default: deny (incoming), allow (outgoing), disabled (routed)
+#New profiles: skip
+#
+#To                         Action      From
+#--                         ------      ----
+#22/tcp                     ALLOW IN    Anywhere                  
+#22                         ALLOW IN    Anywhere                  
+#22/tcp (v6)                ALLOW IN    Anywhere (v6)             
+#22 (v6)                    ALLOW IN    Anywhere (v6)  
+
+
+
