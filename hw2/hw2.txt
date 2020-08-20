@@ -1,0 +1,66 @@
+---Задание №1---
+
+
+ilnaz@ubuntu-linux:~/Desktop$ cat > file1.txt
+hello world!
+this is my first file here.
+^C
+ilnaz@ubuntu-linux:~/Desktop$ cat > file2.txt
+hello world again!
+this is my second file on Desktop.    
+^C
+ilnaz@ubuntu-linux:~/Desktop$ cat file1.txt
+hello world!
+this is my first file here.
+ilnaz@ubuntu-linux:~/Desktop$ cat file2.txt
+hello world again!
+this is my second file on Desktop.
+ilnaz@ubuntu-linux:~/Desktop$ cat file1 file2 > file1-2.txt
+cat: file1: No such file or directory
+cat: file2: No such file or directory
+ilnaz@ubuntu-linux:~/Desktop$ rm file1-2.txt
+ilnaz@ubuntu-linux:~/Desktop$ cat file1.txt file2.txt > file1-2.txt
+ilnaz@ubuntu-linux:~/Desktop$ cat file1-2.txt
+hello world!
+this is my first file here.
+hello world again!
+this is my second file on Desktop.
+ilnaz@ubuntu-linux:~/Desktop$ 
+
+------------------------------
+
+--- Задание №2 ---
+ilnaz@ubuntu-linux:~$ ls -a
+.              Downloads  .sudo_as_admin_successful
+..             .gnupg     Templates
+.bash_history  .local     .vboxclient-clipboard.pid
+.bash_logout   .mozilla   .vboxclient-display-svga-x11.pid
+.bashrc        Music      .vboxclient-draganddrop.pid
+.cache         Pictures   .vboxclient-seamless.pid
+.config        .profile   Videos
+Desktop        Public
+Documents      .ssh
+ilnaz@ubuntu-linux:~$ find -maxdepth 1 -type f -name '.*' | wc -l
+9
+ilnaz@ubuntu-linux:~$ 
+
+------------------------------
+
+--- Задание №3 ---
+3.1 curl -O https://raw.githubusercontent.com/mtuktarov/linux_goodies/master/docker/python/uwsgi/flaskapp.py.  (загрузка файла скрипта в папку scripts на рабочем столе ВМ)
+3.2 sudo chmod a+x flaskapp.py (изменение прав с rw - на возможность запуска)
+3.3 python2 и python3 установлены.
+3.4 sudo apt install python3-pip (установка модуля pip), pip3 install flask (установка модуля flask для python)
+3.5 Задаем для переменной окружения FLASK_HOST значение ip-адреса ВМ. 
+sudo nano .bashrc - открываем .bashrc в редакторе, для внесения изменений.
+export FLASK_HOST='192.168.1.67' - добавляем последнюю строчку в файл. Сохраняем, закрываем. Ребут. После ребута проверяем сохранилось ли значение FLASK_HOST, командой echo $FLASK_HOST.
+Sudo ufw allow 5000 - Добавляем порт 5000 в исключения на ВМ.
+Запускаем flaskapp.py, видим что он запущен по адресу http://192.168.1.67:5000/
+В браузере хоста открываем адрес http://192.168.1.67:5000/ - открывается скрипт калькулятора.
+3.6 echo PATH=$PATH:/home/ilnaz/Desktop/scripts >> ~/etc/bash.bashrc (записываем директорию в PATH, для того чтобы запускать flaskapp.py без указания полного пути). Запись устойчива к перезагрузке. Flaskapp.py запускается в терминале без указания полного адреса. #PS. Пришлось поменять первую строчку кода flaskapp.py - #!/usr/bin/env python >> #!/usr/bin/env python3
+
+
+
+
+
+
