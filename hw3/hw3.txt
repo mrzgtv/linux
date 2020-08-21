@@ -1,0 +1,137 @@
+---------- Задание №1 ----------
+
+
+# 1a - создать пользователя user1, указав shell /bin/bash и создав домашний каталог, используя утилиту useradd; 
+
+ilnaz@ubuntu-linux:~$ sudo useradd -m -s /bin/bash user1
+
+# 1b - создать пользователя user2, указав shell /bin/bash и создав домашний каталог, используя утилиту используя утилиту adduser; 
+
+ilnaz@ubuntu-linux:~$ sudo adduser user2
+Adding user `user2' ...
+Adding new group `user2' (1002) ...
+Adding new user `user2' (1002) with group `user2' ...
+Creating home directory `/home/user2' ...
+Copying files from `/etc/skel' ...
+New password: 
+Retype new password: 
+passwd: password updated successfully
+Changing the user information for user2
+Enter the new value, or press ENTER for the default
+	Full Name []: 
+	Room Number []: 
+	Work Phone []: 
+	Home Phone []: 
+	Other []: 
+Is the information correct? [Y/n] y
+
+Проверка списка пользователей и групп (user1, user2)
+ilnaz@ubuntu-linux:~$ cat /etc/passwd
+
+user1:x:1001:1001::/home/user1:/bin/bash
+user2:x:1002:1002:,,,:/home/user2:/bin/bash
+
+# 1c - удалить пользователя user1 вместе с домашним каталогом, используя утилиту userdel;
+
+ilnaz@ubuntu-linux:~$ sudo userdel -f -r user1
+userdel: user user1 is currently used by process 6749
+userdel: user1 mail spool (/var/mail/user1) not found
+
+ilnaz@ubuntu-linux:~$ cat /etc/passwd
+
+user2:x:1002:1002:,,,:/home/user2:/bin/bash
+
+# 1d - создать пользователя user1, указав основную группу user2
+
+ilnaz@ubuntu-linux:~$ sudo useradd -g user2 user1
+
+ilnaz@ubuntu-linux:~$ cat /etc/passwd
+
+user2:x:1002:1002:,,,:/home/user2:/bin/bash
+user1:x:1003:1002::/home/user1:/bin/sh
+
+# 1e - сменить пароль user1 одного из созданных пользователей, используя passwd
+
+ilnaz@ubuntu-linux:~$ su - root
+Password: 
+root@ubuntu-linux:~# passwd user1
+New password: 
+Retype new password: 
+passwd: password updated successfully
+
+# 1f - сменить пароль user2 одного из созданных пользователей, используя usermod
+
+root@ubuntu-linux:~# openssl passwd -6 qwerty        #создаем хэш пароля, копируем полученный хэш
+$6$qytvrgyzE9/ENc5j$2do8Kg/IjEX1QciYfRxlp0i7yEGM3C3LtwPLiNKUM7k99qkREWVkk1L05/nCJEKp7hohxLIjyqC.8davQe7W51
+root@ubuntu-linux:~# sudo usermod -p '$6$qytvrgyzE9/ENc5j$2do8Kg/IjEX1QciYfRxlp0i7yEGM3C3LtwPLiNKUM7k99qkREWVkk1L05/nCJEKp7hohxLIjyqC.8davQe7W51' user2      #задаем для пользователя user2 пароль "qwerty"
+root@ubuntu-linux:~# cat /etc/shadow
+
+user2:$6$qytvrgyzE9/ENc5j$2do8Kg/IjEX1QciYfRxlp0i7yEGM3C3LtwPLiNKUM7k99qkREWVkk1L05/nCJEKp7hohxLIjyqC.8davQe7W51:18495:0:99999:7:::
+user1:$6$.mMLlf1u7c3MGboF$2uK7BdCKcTjXoz8aoWNAFFphLj0sNLbnnIaa12SPAgRy5z6Mbnx6zTN7E9GQLn2s9aQ6E3hKqbnoLxz5tkrz21:18495:0:99999:7:::
+
+
+
+---------- Задание №2 ----------
+
+
+# 2a - создать группы group1, group2 с использованием groupadd; 
+
+ilnaz@ubuntu-linux:~$ sudo groupadd group1
+ilnaz@ubuntu-linux:~$ sudo groupadd group2
+
+
+# 2b - добавить user1 в группы group1, group2 разом при помощи одной команды usermod, не меняя его основной группы; 
+
+
+ilnaz@ubuntu-linux:~$ sudo usermod -aG group1,group2 user1
+ilnaz@ubuntu-linux:~$ su - user1
+Password: 
+su: warning: cannot change directory to /home/user1: No such file or directory
+$ groups
+user2 group1 group2
+$ 
+
+# 2c - создать группу user1 с GID=1516 и сделать ее основной для пользователя user1
+
+ilnaz@ubuntu-linux:~$ sudo groupadd -g 1516 user1
+ilnaz@ubuntu-linux:~$ cat /etc/group
+
+
+user2:x:1002:
+group1:x:1003:user1
+group2:x:1004:user1
+user1:x:1516:
+
+ilnaz@ubuntu-linux:~$ sudo usermod -g user1 user1
+ilnaz@ubuntu-linux:~$ cat /etc/passwd
+
+user2:x:1002:1002:,,,:/home/user2:/bin/bash
+user1:x:1003:1516::/home/user1:/bin/sh
+
+
+---------- Задание №3 ----------
+
+#Создать пользователя с правами суперпользователя. Сделать так, чтобы sudo не требовал пароль для выполнения команд.
+
+
+ilnaz@ubuntu-linux:~$ sudo useradd -ou 0 -g0 superuser.  (Создание пользователя superuser с root правами. -ou разрешаем создание пользователя с неуникальным uid=0)
+ilnaz@ubuntu-linux:~$ cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+
+
+user2:x:1002:1002:,,,:/home/user2:/bin/bash
+user1:x:1003:1516::/home/user1:/bin/sh
+superuser:x:0:0::/home/superuser:/bin/sh
+
+Т.к. у superuser root-права, команды sudo выполняются без дополнительного ввода пароля.
+
+
+
+
+
+
+
+
+
+
+
