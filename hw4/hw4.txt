@@ -1,0 +1,128 @@
+---------- Задание №1 ----------
+
+#1. Прочитать в методическом пособии о сигналах. 
+Запустить в одном терминале программу nano. В другом терминале посмотреть PID процесса (используйте ps aux) и остановить с помощью kill, посылая разные типы сигналов (SIGHUP, SIGTERM, SIGSEGV, SIGILL). Чем отличается заверщение программы в зависимости от сигнала?
+
+Решение:
+SIGHUP
+Команда nano в первом терминале - открывается текстовый редактор.
+Команда ps aux 	во втором терминале - открывается список процессов. PID nano = 3021
+
+Команда kill sighup 3021 во втором терминале - вывод: -bash: kill: sighup: arguments must be process or job IDs
+
+В первом терминале - вывод: Received SIGHUP or SIGTERM
+Редактор закрылся.
+
+Команда ps aux 	во втором терминале - процессы nano в списке нет.
+
+-----------------
+
+SIGTERM
+Команда nano в первом терминале - открывается текстовый редактор.
+Команда ps aux 	во втором терминале - открывается список процессов. PID nano = 3025
+
+Команда kill sigterm 3025 во втором терминале - вывод: -bash: kill: sigterm: arguments must be process or job IDs
+
+В первом терминале - вывод: Received SIGHUP or SIGTERM
+Редактор закрылся.
+
+Команда ps aux 	во втором терминале - процессы nano в списке нет.
+
+-----------------
+
+SIGSEGV
+Команда nano в первом терминале - открывается текстовый редактор.
+Команда ps aux 	во втором терминале - открывается список процессов. PID nano = 3029
+
+Команда kill sigsegv 3029 во втором терминале - вывод: -bash: kill: sigsegv: arguments must be process or job IDs
+
+В первом терминале - вывод: Received SIGHUP or SIGTERM
+Редактор закрылся.
+
+Команда ps aux 	во втором терминале - процессы nano в списке нет.
+
+-----------------
+
+SIGILL
+Команда nano в первом терминале - открывается текстовый редактор.
+Команда ps aux 	во втором терминале - открывается список процессов. PID nano = 3035
+
+Команда kill sigill 3035 во втором терминале - вывод: -bash: kill: sigill: arguments must be process or job IDs
+
+В первом терминале - вывод: Received SIGHUP or SIGTERM
+Редактор закрылся.
+
+Команда ps aux 	во втором терминале - процессы nano в списке нет.
+
+-----------------
+
+SIGKILL
+Команда nano в первом терминале - открывается текстовый редактор.
+Команда ps aux 	во втором терминале - открывается список процессов. PID nano = 3041
+
+Команда kill sigkill 3041 во втором терминале - вывод: -bash: kill: sigkill: arguments must be process or job IDs
+
+В первом терминале - вывод: Received SIGHUP or SIGTERM
+Редактор закрылся.
+
+Команда ps aux 	во втором терминале - процессы nano в списке нет.
+
+
+
+---------- Задание №2 ----------
+
+#2. Самостоятельно найти информацию о том, какой сигнал посылается запущенной программе при нажатии комбинации ctrl+c и ctrl+d. Создайте файл при помощи команды cat > file_name, напишите текст и завершите комбинацией ctrl+d. Какой сигнал передадим процессу?
+
+Решение:
+
+ctrl+c = kill sigint PID-процесса
+ctrl+d = kill -9 PID-процесса
+
+В первом терминале:
+ilnaz@ubuntu-linux:~/Desktop$ cat > 123.txt
+123
+31123
+wqwee
+
+Во втором терминале:
+
+ps aux
+PID процесса cat - 3270
+kill -9 3270
+
+Вывод в первом терминале:
+
+ilnaz@ubuntu-linux:~/Desktop$ cat > 123.txt
+123
+31123
+wqwee
+Killed
+ilnaz@ubuntu-linux:~/Desktop$ ls
+123.txt  file1-2.txt  file1.txt  file2.txt  scripts
+ilnaz@ubuntu-linux:~/Desktop$ cat 123.txt
+123
+31123
+wqwee
+ilnaz@ubuntu-linux:~/Desktop$ 
+
+
+Файл создан, введенные данные сохранены.
+
+---------- Задание №3 ----------
+#3. Изменить конфигурационный файл службы SSH: /etc/ssh/sshd_config, отключив аутентификацию по паролю PasswordAuthentication no. Выполните рестарт службы systemctl restart sshd (service sshd restart), верните аутентификацию по паролю, выполните reload службы systemctl reload sshd (services sshd reload). В чём различие между действиями restart и reload?
+
+
+Открываем конфиг-файл - sudo nano /etc/ssh/sshd_config. Находим строчку PasswordAuthentication, меняем значение на No, расскомментируем строчку. ctrl+x, выходим с сохранением изменений. systemctl restart sshd (служба sshd была остановлена и перезапущена с измененным конфигом). systemctl status sshd - проверяем статус службы, запущен несколько секунд назад.
+
+* При неправильно настроенном подключении по ssh-ключам (неверный ключ, ключа нет, ключ не добавлен в authorized_keys) и при параметре PasswordAuthentication No не получится подключиться к ВМ, получим следующую ошибку:
+ilnazmirzagitov@MacBook-Air-Ilnaz ~ % ssh ilnaz@192.168.1.67
+ilnaz@192.168.1.67: Permission denied (publickey).
+
+Открываем конфиг-файл - sudo nano /etc/ssh/sshd_config. Находим строчку PasswordAuthentication, меняем значение на Yes. ctrl+x, выходим с сохранением изменений. systemctl reload sshd (служба sshd не была остановлена, а продолжила работу с перечитыванием конфигурация-файла). systemctl status sshd - проверяем статус службы.
+
+* При неправильно настроенном подключении по ssh-ключам (неверный ключ, ключа нет, ключ не добавлен в authorized_keys) и при параметре PasswordAuthentication Yes получится подключиться к ВМ, только введя пароль от учетной записи, к которой мы хотим подключиться на ВМ.
+
+
+
+
+
