@@ -1,0 +1,234 @@
+---------- Задание №1 ----------
+
+#1. Создание ссылок:
+- создать файл file1 и наполнить его произвольным содержимым.
+- скопировать файл file1 в file2.
+- создать символическую ссылку file3 на file1.
+- создать жесткую ссылку file4 на file1.
+- посмотреть, какие айноды у файлов.
+- удалить file1. Что стало с остальными созданными файлами? Попробовать вывести их содержимое на экран.
+- удалить все остальные файлы
+
+-----------------
+
+Решение:
+
+ilnaz@ubuntu-linux:~/Desktop/test$ cat > file1
+1
+2
+3
+4
+5
+^C
+ilnaz@ubuntu-linux:~/Desktop/test$ ls
+file1
+ilnaz@ubuntu-linux:~/Desktop/test$ cat file1
+1
+2
+3
+4
+5
+ilnaz@ubuntu-linux:~/Desktop/test$ cp file1 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ ls
+file1  file2
+ilnaz@ubuntu-linux:~/Desktop/test$ cat file2
+1
+2
+3
+4
+5
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -liah
+total 16K
+524829 drwxrwxr-x 2 ilnaz ilnaz 4,0K авг 31 12:59 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4,0K авг 31 12:19 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:19 file1
+552716 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:59 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ ln -s file1 file3
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 16
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 13:46 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 12:19 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:19 file1
+552716 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:59 file2
+552719 lrwxrwxrwx 1 ilnaz ilnaz    5 авг 31 13:46 file3 -> file1
+ilnaz@ubuntu-linux:~/Desktop/test$ ln file1 file4
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 20
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 13:46 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 12:19 ..
+527151 -rw-rw-r-- 2 ilnaz ilnaz   10 авг 31 12:19 file1
+552716 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:59 file2
+552719 lrwxrwxrwx 1 ilnaz ilnaz    5 авг 31 13:46 file3 -> file1
+527151 -rw-rw-r-- 2 ilnaz ilnaz   10 авг 31 12:19 file4
+ilnaz@ubuntu-linux:~/Desktop/test$ rm file1
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 16
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 13:47 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 12:19 ..
+552716 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:59 file2
+552719 lrwxrwxrwx 1 ilnaz ilnaz    5 авг 31 13:46 file3 -> file1
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 12:19 file4
+ilnaz@ubuntu-linux:~/Desktop/test$ cat file2
+1
+2
+3
+4
+5
+ilnaz@ubuntu-linux:~/Desktop/test$ cat file3
+cat: file3: No such file or directory
+ilnaz@ubuntu-linux:~/Desktop/test$ cat file4
+1
+2
+3
+4
+5
+
+-----------------
+После удаления file1 - символическая ссылка file3 перестала работать, т.к. она стала ссылаться на несуществующий файл.
+Жесткая ссылка file4 - осталась работать, т.к. при удалении file1 - inode не был удален, а было уменьшено количество жестких ссылок на эту область данных (было 2 hlink, осталась 1).
+Удаление file1 никак не повлияло на file2, т.к. при копировании из file1 в file2, file2 занял другую область данных на диске, никак не связанную с file1.
+
+
+
+
+---------- Задание №2 ----------
+
+#2. Работа со ссылками:
+- создать файл file1 и наполнить его произвольным содержимым.
+- создать символическую ссылку file1_link, указывающую на этот файл.
+- переместить ссылку в другую директорию. Работает ли она? Почему? Если не работает, как сделать так, чтобы работала?
+
+-----------------
+
+Решение:
+
+Создаем файл (file1), символическую ссылку на него (file1_link), перемещаем file1_link в другую директорию. Видим, что ссылка перестает работать (т.к. она хранит в себе только имя файла, на которое ссылается(без inode)).
+
+ilnaz@ubuntu-linux:~/Desktop/test$ cat > file1
+tra 
+ta
+ta
+^C
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 12
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 13:59 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 12:19 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 13:59 file1
+ilnaz@ubuntu-linux:~/Desktop/test$ ln -s file1 file1_link
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 12
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 14:01 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 12:19 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 13:59 file1
+527149 lrwxrwxrwx 1 ilnaz ilnaz    5 авг 31 14:01 file1_link -> file1
+ilnaz@ubuntu-linux:~/Desktop/test$ mv file1_link ../
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 12
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 14:03 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 14:03 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 13:59 file1
+ilnaz@ubuntu-linux:~/Desktop/test$ cd ..
+ilnaz@ubuntu-linux:~/Desktop$ ls -lia
+total 16
+267313 drwxr-xr-x  4 ilnaz ilnaz 4096 авг 31 14:03 .
+406561 drwxr-xr-x 16 ilnaz ilnaz 4096 авг 31 10:53 ..
+527149 lrwxrwxrwx  1 ilnaz ilnaz    5 авг 31 14:01 file1_link -> file1
+311470 drwxrwxr-x  2 ilnaz ilnaz 4096 авг 20 12:28 scripts
+524829 drwxrwxr-x  2 ilnaz ilnaz 4096 авг 31 14:03 test
+ilnaz@ubuntu-linux:~/Desktop$ cat file1_link
+cat: file1_link: No such file or directory
+
+
+Для того чтобы при перемещении ссылка не переставала работать, необходимо при его создании указывать абсолютную ссылку нахождения исходного файла.
+
+ilnaz@ubuntu-linux:~/Desktop/test$ ln -s $(pwd)/file1 file1_link
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 12
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 14:25 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 14:13 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 13:59 file1
+527435 lrwxrwxrwx 1 ilnaz ilnaz   30 авг 31 14:25 file1_link -> /home/ilnaz/Desktop/test/file1
+ilnaz@ubuntu-linux:~/Desktop/test$ mv file1_link ../
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -lia
+total 12
+524829 drwxrwxr-x 2 ilnaz ilnaz 4096 авг 31 14:25 .
+267313 drwxr-xr-x 4 ilnaz ilnaz 4096 авг 31 14:25 ..
+527151 -rw-rw-r-- 1 ilnaz ilnaz   10 авг 31 13:59 file1
+ilnaz@ubuntu-linux:~/Desktop/test$ cd ..
+ilnaz@ubuntu-linux:~/Desktop$ ls -lia
+total 16
+267313 drwxr-xr-x  4 ilnaz ilnaz 4096 авг 31 14:25 .
+406561 drwxr-xr-x 16 ilnaz ilnaz 4096 авг 31 10:53 ..
+527435 lrwxrwxrwx  1 ilnaz ilnaz   30 авг 31 14:25 file1_link -> /home/ilnaz/Desktop/test/file1
+311470 drwxrwxr-x  2 ilnaz ilnaz 4096 авг 20 12:28 scripts
+524829 drwxrwxr-x  2 ilnaz ilnaz 4096 авг 31 14:25 test
+ilnaz@ubuntu-linux:~/Desktop$ cat file1_link
+tra
+ta
+ta
+ilnaz@ubuntu-linux:~/Desktop$ 
+
+
+---------- Задание №3 ----------
+#3. Права файлов:
+- создать два произвольных файла.
+- первому файлу присвоить права на чтение, запись для владельца и группы; на чтение для всех. Сделать это в численном и символьном виде.
+- второму файлу присвоить права на чтение, запись только для владельца. Сделать это в численном и символьном виде.
+
+
+-----------------
+
+Решение:
+
+В символьном виде:
+
+ilnaz@ubuntu-linux:~/Desktop/test$ touch file1
+ilnaz@ubuntu-linux:~/Desktop/test$ touch file2
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+-rw-rw-r-- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+-rw-rw-r-- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod a-rwx file1 file2  ------------ убираем все права обоих файлов
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod ug+rw file1   - права на чтение и запись для владельца и группы
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+-rw-rw---- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod a+r file1 - права на чтение для всех
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+-rw-rw-r-- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod u+rw file2    - права на чтение и запись для владельца
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+-rw-rw-r-- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+-rw------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+
+
+В численном виде:
+
+
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod 000 file1 file2   ------------ убираем все права обоих файлов
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod 664 file1   - права на чтение и запись для владельца и группы, и на чтение для всех остальных
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+-rw-rw-r-- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+---------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ chmod 600 file2  - права на чтение и запись для владельца
+ilnaz@ubuntu-linux:~/Desktop/test$ ls -l
+total 0
+-rw-rw-r-- 1 ilnaz ilnaz 0 авг 31 14:46 file1
+-rw------- 1 ilnaz ilnaz 0 авг 31 14:46 file2
+ilnaz@ubuntu-linux:~/Desktop/test$ 
+
+
+
